@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sleeptube/components/search_input/search_input.dart';
+import 'package:sleeptube/models/PopularVideosResponse.dart';
+import 'package:sleeptube/providers/youtube_provider.dart';
 import 'package:sleeptube/utils/constants.dart';
 
 class Home extends StatefulWidget {
@@ -37,31 +40,41 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> _loadMoreData() async {
-    if (!_isLoading) {
-      setState(() {
-        _isLoading = true;
-      });
+    // if (!_isLoading) {
+    //   setState(() {
+    //     _isLoading = true;
+    //   });
 
-      // Simulating a delay for fetching more data
-      await Future.delayed(const Duration(seconds: 2));
+    //   // Simulating a delay for fetching more data
+    //   await Future.delayed(const Duration(seconds: 2));
 
-      // Append new data to the existing list
-      List<String> newDataList =
-          List.generate(10, (index) => 'Item ${_dataList.length + index}');
-      setState(() {
-        _dataList.addAll(newDataList);
-        _isLoading = false;
-      });
-    }
+    //   // Append new data to the existing list
+    //   List<String> newDataList =
+    //       List.generate(10, (index) => 'Item ${_dataList.length + index}');
+    //   setState(() {
+    //     _dataList.addAll(newDataList);
+    //     _isLoading = false;
+    //   });
+    // }
   }
 
   @override
   Widget build(BuildContext context) {
+    PopularVideosResponse? popularVideosResponse =
+        Provider.of<YoutubeProvider>(context).popularVideos;
+    List<Items>? items = popularVideosResponse?.items;
+
+    print("items: $items");
+
+    if (items == null) {
+      return Container();
+    }
     return Column(
       children: [
         Flexible(
           child: ListView(
             shrinkWrap: true,
+            physics: const AlwaysScrollableScrollPhysics(),
             children: [
               Container(
                 padding: const EdgeInsets.only(
@@ -72,11 +85,24 @@ class _HomeState extends State<Home> {
                 ),
                 child: SearchInput(),
               ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: MyConst.CONTAINER_PADDING,
+                  vertical: MyConst.CONTAINER_PADDING / 2,
+                ),
+                child: Text(
+                  "Popular Videos",
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ),
               ListView.separated(
                 controller: _scrollController,
-                itemCount: _dataList.length + 1,
+                itemCount: items.length + 1,
                 shrinkWrap: true,
-                physics: const AlwaysScrollableScrollPhysics(),
+                // physics: const NeverScrollableScrollPhysics(),
                 separatorBuilder: (context, index) {
                   return Divider(
                     thickness: 1,
@@ -85,65 +111,81 @@ class _HomeState extends State<Home> {
                   );
                 },
                 itemBuilder: (context, index) {
-                  if (index < _dataList.length) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: MyConst.CONTAINER_PADDING,
-                        vertical: 12.0,
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(2.0),
-                                child: Image.network(
-                                  "https://upload.wikimedia.org/wikipedia/commons/e/ee/Sample_abc.jpg",
-                                  height: 50,
-                                  width: 70,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 12,
-                              ),
-                              Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                  if (index < items.length) {
+                    return GestureDetector(
+                      onTap: () {},
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: MyConst.CONTAINER_PADDING,
+                          vertical: 8.0,
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    _dataList[index],
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(2.0),
+                                    child: Image.network(
+                                      items[index]
+                                          .snippet!
+                                          .thumbnails!
+                                          .def!
+                                          .url!,
+                                      height: 44,
+                                      width: 44,
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
                                   const SizedBox(
-                                    height: 4,
+                                    width: 12,
                                   ),
-                                  Text(
-                                    _dataList[index],
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w400,
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          items[index].snippet!.title!,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(
+                                          height: 4,
+                                        ),
+                                        Text(
+                                          items[index].snippet!.channelTitle!,
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
-                              )
-                            ],
-                          ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.play_arrow,
+                              ),
                             ),
-                            onPressed: () {},
-                          ),
-                        ],
+                            // const SizedBox(
+                            //   width: 8.0,
+                            // ),
+                            // IconButton(
+                            //   icon: const Icon(
+                            //     Icons.play_arrow,
+                            //   ),
+                            //   onPressed: () {},
+                            // ),
+                          ],
+                        ),
                       ),
                     );
                   } else {

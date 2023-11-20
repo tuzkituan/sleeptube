@@ -5,6 +5,6 @@ import 'package:flutter/material.dart';
 class MyConst {
   static const String APP_NAME = "SLEEPTUBE";
   static const double CONTAINER_PADDING = 16.0;
-  static final Color MAIN_COLOR = Colors.deepPurple[900]!;
-  static final Color LIGHT_MAIN_COLOR = Colors.deepPurple[400]!;
+  static final Color MAIN_COLOR = Colors.deepOrange[900]!;
+  static final Color LIGHT_MAIN_COLOR = Colors.deepOrange[400]!;
 }

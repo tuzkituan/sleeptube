@@ -1,13 +1,37 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleeptube/components/logo/logo.dart';
+import 'package:sleeptube/providers/youtube_provider.dart';
 import 'package:sleeptube/utils/constants.dart';
 import 'package:sleeptube/views/home/home.dart';
 
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarBrightness: Brightness.dark,
+    statusBarIconBrightness: Brightness.dark,
+    systemNavigationBarIconBrightness: Brightness.light,
+    systemNavigationBarColor: Colors.transparent,
+    systemNavigationBarDividerColor: Colors.transparent,
+  ));
+
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge,
+      overlays: [SystemUiOverlay.top]);
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => YoutubeProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 ThemeData _buildTheme(brightness) {
@@ -20,8 +44,33 @@ ThemeData _buildTheme(brightness) {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Future<void> getData() async {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final youtubeProvider =
+          Provider.of<YoutubeProvider>(context, listen: false);
+      youtubeProvider.getPopularVideo({
+        "part": "snippet",
+        "chart": "mostPopular",
+        "regionCode": "vn",
+        "maxResults": "15",
+        // "videoCategoryId": "17"
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getData();
+  }
 
   Widget renderMediaButton(IconData icon, void Function()? onPressed) {
     return InkWell(
@@ -45,13 +94,26 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: _buildTheme(Brightness.dark),
       themeMode: ThemeMode.system,
-      scrollBehavior: MyCustomScrollBehavior(),
+      scrollBehavior: NoThumbScrollBehavior(),
       home: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.black,
           foregroundColor: Colors.white,
           scrolledUnderElevation: 0.0,
           title: const Logo(),
+          centerTitle: false,
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(
+                right: MyConst.CONTAINER_PADDING,
+              ),
+              child: IconButton(
+                onPressed: () {},
+                iconSize: 20,
+                icon: const Icon(Icons.timer_outlined),
+              ),
+            ),
+          ],
         ),
         bottomNavigationBar: Container(
           height: 70,
@@ -60,13 +122,13 @@ class MyApp extends StatelessWidget {
             vertical: 8.0,
           ),
           decoration: BoxDecoration(
-            color: MyConst.MAIN_COLOR,
+            color: Colors.grey[900],
           ),
           child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -75,9 +137,10 @@ class MyApp extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
+                        color: MyConst.LIGHT_MAIN_COLOR,
                       ),
                     ),
-                    Text(
+                    const Text(
                       "Justin Baby",
                       style: TextStyle(
                         fontSize: 11,
@@ -116,11 +179,17 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// Enable scrolling with mouse dragging
-class MyCustomScrollBehavior extends MaterialScrollBehavior {
+class NoThumbScrollBehavior extends ScrollBehavior {
   @override
   Set<PointerDeviceKind> get dragDevices => {
         PointerDeviceKind.touch,
         PointerDeviceKind.mouse,
+        PointerDeviceKind.stylus,
       };
+
+  @override
+  Widget buildOverscrollIndicator(
+      BuildContext context, Widget child, ScrollableDetails details) {
+    return child;
+  }
 }

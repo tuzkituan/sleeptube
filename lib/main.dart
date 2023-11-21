@@ -1,11 +1,13 @@
 import 'dart:ui';
 
+import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sleeptube/components/logo/logo.dart';
+import 'package:sleeptube/models/PlayingVideoModel.dart';
+import 'package:sleeptube/providers/player_provider.dart';
 import 'package:sleeptube/providers/youtube_provider.dart';
 import 'package:sleeptube/utils/constants.dart';
 import 'package:sleeptube/views/home/home.dart';
@@ -28,6 +30,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => YoutubeProvider()),
+        ChangeNotifierProvider(create: (_) => PlayerProvider()),
       ],
       child: const MyApp(),
     ),
@@ -61,7 +64,7 @@ class _MyAppState extends State<MyApp> {
         "chart": "mostPopular",
         "regionCode": "vn",
         "maxResults": "15",
-        // "videoCategoryId": "17"
+        "videoCategoryId": "10"
       });
     });
   }
@@ -89,6 +92,9 @@ class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    PlayerProvider playerProvider = Provider.of<PlayerProvider>(context);
+    PlayingVideoModal currentVideo = playerProvider.currentVideo;
+
     return MaterialApp(
       title: MyConst.APP_NAME,
       debugShowCheckedModeBanner: false,
@@ -115,64 +121,129 @@ class _MyAppState extends State<MyApp> {
             ),
           ],
         ),
-        bottomNavigationBar: Container(
-          height: 70,
-          padding: const EdgeInsets.symmetric(
-            horizontal: MyConst.CONTAINER_PADDING,
-            vertical: 8.0,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.grey[900],
-          ),
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        bottomNavigationBar: playerProvider.isLoaded
+            ? Container(
+                height: 85,
+                decoration: BoxDecoration(
+                  color: Colors.grey[900],
+                ),
+                child: Column(
                   children: [
-                    Text(
-                      "Hello Vietnam",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: MyConst.LIGHT_MAIN_COLOR,
-                      ),
+                    Transform.translate(
+                      offset: const Offset(0, -4),
+                      child: StreamBuilder(
+                          stream: playerProvider.audioPlayer.positionStream,
+                          builder: (context, snapshot1) {
+                            final Duration duration = playerProvider.isLoaded
+                                ? snapshot1.data as Duration
+                                : const Duration(seconds: 0);
+                            return StreamBuilder(
+                                stream: playerProvider
+                                    .audioPlayer.bufferedPositionStream,
+                                builder: (context, snapshot2) {
+                                  final Duration bufferedDuration =
+                                      playerProvider.isLoaded
+                                          ? snapshot2.data as Duration
+                                          : const Duration(seconds: 0);
+                                  return ProgressBar(
+                                    progress: duration,
+                                    total:
+                                        playerProvider.audioPlayer.duration ??
+                                            const Duration(seconds: 0),
+                                    buffered: bufferedDuration,
+                                    timeLabelLocation: TimeLabelLocation.none,
+                                    progressBarColor: MyConst.LIGHT_MAIN_COLOR,
+                                    baseBarColor: Colors.grey[600],
+                                    bufferedBarColor: Colors.grey[350],
+                                    thumbColor: MyConst.LIGHT_MAIN_COLOR,
+                                    barHeight: 2,
+                                    thumbRadius: 6,
+                                    onSeek: playerProvider.isLoaded
+                                        ? (duration) async {
+                                            await playerProvider.audioPlayer
+                                                .seek(duration);
+                                          }
+                                        : null,
+                                  );
+                                });
+                          }),
                     ),
-                    const Text(
-                      "Justin Baby",
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w400,
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: MyConst.CONTAINER_PADDING,
+                          right: MyConst.CONTAINER_PADDING,
+                          top: 0.0,
+                          bottom: 24.0,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text(
+                                    currentVideo.title ?? "Unknown",
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      // color: MyConst.LIGHT_MAIN_COLOR,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    currentVideo.author ?? "Unknown",
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 12,
+                            ),
+                            Row(
+                              children: [
+                                renderMediaButton(
+                                  Icons.skip_previous,
+                                  () {},
+                                ),
+                                const SizedBox(
+                                  width: 4.0,
+                                ),
+                                renderMediaButton(
+                                  playerProvider.isPlaying
+                                      ? Icons.pause
+                                      : Icons.play_arrow,
+                                  () {
+                                    playerProvider.isPlaying
+                                        ? playerProvider.onPause()
+                                        : playerProvider.onPlay();
+                                  },
+                                ),
+                                const SizedBox(
+                                  width: 4.0,
+                                ),
+                                renderMediaButton(
+                                  Icons.skip_next,
+                                  () {},
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
-                Row(
-                  children: [
-                    renderMediaButton(
-                      Icons.skip_previous,
-                      () {},
-                    ),
-                    const SizedBox(
-                      width: 4.0,
-                    ),
-                    renderMediaButton(
-                      Icons.pause,
-                      () {},
-                    ),
-                    const SizedBox(
-                      width: 4.0,
-                    ),
-                    renderMediaButton(
-                      Icons.skip_next,
-                      () {},
-                    ),
-                  ],
-                )
-              ]),
-        ),
+              )
+            : Container(),
         body: const Home(),
       ),
     );

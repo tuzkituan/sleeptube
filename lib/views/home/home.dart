@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sleeptube/components/search_input/search_input.dart';
 import 'package:sleeptube/models/PopularVideosResponse.dart';
+import 'package:sleeptube/providers/player_provider.dart';
 import 'package:sleeptube/providers/youtube_provider.dart';
 import 'package:sleeptube/utils/constants.dart';
 
@@ -16,7 +17,7 @@ class _HomeState extends State<Home> {
   ScrollController _scrollController = ScrollController();
   bool _isLoading = false;
 
-  List<String> _dataList = List.generate(20, (index) => 'Item $index');
+  // List<String> _dataList = List.generate(20, (index) => 'Item $index');
 
   @override
   void initState() {
@@ -58,13 +59,17 @@ class _HomeState extends State<Home> {
     // }
   }
 
+  void onSelectVideo(Items item) async {
+    PlayerProvider playerProvider =
+        Provider.of<PlayerProvider>(context, listen: false);
+    playerProvider.onStartPlay(item);
+  }
+
   @override
   Widget build(BuildContext context) {
     PopularVideosResponse? popularVideosResponse =
         Provider.of<YoutubeProvider>(context).popularVideos;
     List<Items>? items = popularVideosResponse?.items;
-
-    print("items: $items");
 
     if (items == null) {
       return Container();
@@ -113,7 +118,7 @@ class _HomeState extends State<Home> {
                 itemBuilder: (context, index) {
                   if (index < items.length) {
                     return GestureDetector(
-                      onTap: () {},
+                      onTap: () => onSelectVideo(items[index]),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: MyConst.CONTAINER_PADDING,

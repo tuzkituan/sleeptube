@@ -1,4 +1,5 @@
 class PlayingVideoModal {
+  String? id;
   String? title;
   String? author;
   String? channelId;
@@ -6,13 +7,15 @@ class PlayingVideoModal {
   String? description;
 
   PlayingVideoModal(
-      {this.title,
+      {this.id,
+      this.title,
       this.author,
       this.channelId,
       this.uploadDate,
       this.description});
 
   PlayingVideoModal.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
     title = json['title'];
     author = json['author'];
     channelId = json['channelId'];
@@ -22,6 +25,7 @@ class PlayingVideoModal {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
     data['title'] = title;
     data['author'] = author;
     data['channelId'] = channelId;

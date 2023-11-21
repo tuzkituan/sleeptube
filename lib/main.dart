@@ -9,6 +9,7 @@ import 'package:sleeptube/components/logo/logo.dart';
 import 'package:sleeptube/models/PlayingVideoModel.dart';
 import 'package:sleeptube/providers/player_provider.dart';
 import 'package:sleeptube/providers/youtube_provider.dart';
+import 'package:sleeptube/utils/color.dart';
 import 'package:sleeptube/utils/constants.dart';
 import 'package:sleeptube/views/home/home.dart';
 
@@ -41,9 +42,9 @@ ThemeData _buildTheme(brightness) {
   var baseTheme = ThemeData(brightness: brightness);
 
   return baseTheme.copyWith(
-    textTheme: GoogleFonts.chakraPetchTextTheme(baseTheme.textTheme),
+    textTheme: GoogleFonts.interTextTheme(baseTheme.textTheme),
     // canvasColor: Colors.black,
-    scaffoldBackgroundColor: Colors.black,
+    scaffoldBackgroundColor: COLOR_E,
   );
 }
 
@@ -81,7 +82,7 @@ class _MyAppState extends State<MyApp> {
       child: Container(
         padding: const EdgeInsets.all(4.0),
         decoration: BoxDecoration(
-          color: Colors.black,
+          color: COLOR_C,
           borderRadius: BorderRadius.circular(2),
         ),
         child: Icon(icon),
@@ -123,9 +124,9 @@ class _MyAppState extends State<MyApp> {
         ),
         bottomNavigationBar: playerProvider.isLoaded
             ? Container(
-                height: 85,
+                height: 74,
                 decoration: BoxDecoration(
-                  color: Colors.grey[900],
+                  color: COLOR_D,
                 ),
                 child: Column(
                   children: [
@@ -134,15 +135,17 @@ class _MyAppState extends State<MyApp> {
                       child: StreamBuilder(
                           stream: playerProvider.audioPlayer.positionStream,
                           builder: (context, snapshot1) {
-                            final Duration duration = playerProvider.isLoaded
-                                ? snapshot1.data as Duration
-                                : const Duration(seconds: 0);
+                            final Duration duration =
+                                playerProvider.isLoaded && snapshot1.hasData
+                                    ? snapshot1.data as Duration
+                                    : const Duration(seconds: 0);
                             return StreamBuilder(
                                 stream: playerProvider
                                     .audioPlayer.bufferedPositionStream,
                                 builder: (context, snapshot2) {
                                   final Duration bufferedDuration =
-                                      playerProvider.isLoaded
+                                      playerProvider.isLoaded &&
+                                              snapshot2.hasData
                                           ? snapshot2.data as Duration
                                           : const Duration(seconds: 0);
                                   return ProgressBar(
@@ -152,10 +155,10 @@ class _MyAppState extends State<MyApp> {
                                             const Duration(seconds: 0),
                                     buffered: bufferedDuration,
                                     timeLabelLocation: TimeLabelLocation.none,
-                                    progressBarColor: MyConst.LIGHT_MAIN_COLOR,
+                                    progressBarColor: COLOR_A,
                                     baseBarColor: Colors.grey[600],
-                                    bufferedBarColor: Colors.grey[350],
-                                    thumbColor: MyConst.LIGHT_MAIN_COLOR,
+                                    bufferedBarColor: COLOR_C,
+                                    thumbColor: COLOR_A,
                                     barHeight: 2,
                                     thumbRadius: 6,
                                     onSeek: playerProvider.isLoaded
@@ -174,7 +177,7 @@ class _MyAppState extends State<MyApp> {
                           left: MyConst.CONTAINER_PADDING,
                           right: MyConst.CONTAINER_PADDING,
                           top: 0.0,
-                          bottom: 24.0,
+                          bottom: 8.0,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -206,17 +209,17 @@ class _MyAppState extends State<MyApp> {
                               ),
                             ),
                             const SizedBox(
-                              width: 12,
+                              width: 24,
                             ),
                             Row(
                               children: [
-                                renderMediaButton(
-                                  Icons.skip_previous,
-                                  () {},
-                                ),
-                                const SizedBox(
-                                  width: 4.0,
-                                ),
+                                // renderMediaButton(
+                                //   Icons.skip_previous,
+                                //   () {},
+                                // ),
+                                // const SizedBox(
+                                //   width: 4.0,
+                                // ),
                                 renderMediaButton(
                                   playerProvider.isPlaying
                                       ? Icons.pause
@@ -227,13 +230,13 @@ class _MyAppState extends State<MyApp> {
                                         : playerProvider.onPlay();
                                   },
                                 ),
-                                const SizedBox(
-                                  width: 4.0,
-                                ),
-                                renderMediaButton(
-                                  Icons.skip_next,
-                                  () {},
-                                ),
+                                // const SizedBox(
+                                //   width: 4.0,
+                                // ),
+                                // renderMediaButton(
+                                //   Icons.skip_next,
+                                //   () {},
+                                // ),
                               ],
                             )
                           ],
@@ -243,7 +246,7 @@ class _MyAppState extends State<MyApp> {
                   ],
                 ),
               )
-            : Container(),
+            : null,
         body: const Home(),
       ),
     );

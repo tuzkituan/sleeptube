@@ -26,6 +26,7 @@ class PlayerProvider with ChangeNotifier {
     var yt = YoutubeExplode();
     Video video = await yt.videos.get('https://youtube.com/watch?v=${item.id}');
     currentVideo = PlayingVideoModal.fromJson({
+      "id": item.id.toString(),
       "title": video.title.toString(),
       "author": video.author.toString(),
       "channelId": video.channelId.toString(),

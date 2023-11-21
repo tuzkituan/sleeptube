@@ -12,6 +12,7 @@ class YoutubeProvider with ChangeNotifier {
       notifyListeners();
       dynamic response = await _youtubeService.getPopularVideo(params);
       notifyListeners();
+      // print("response: $response");
       if (response != null) {
         popularVideos = PopularVideosResponse.fromJson(response);
         notifyListeners();

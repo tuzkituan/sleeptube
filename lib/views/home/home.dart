@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sleeptube/components/search_input/search_input.dart';
+import 'package:sleeptube/models/PlayingVideoModel.dart';
 import 'package:sleeptube/models/PopularVideosResponse.dart';
 import 'package:sleeptube/providers/player_provider.dart';
 import 'package:sleeptube/providers/youtube_provider.dart';
+import 'package:sleeptube/utils/color.dart';
 import 'package:sleeptube/utils/constants.dart';
 
 class Home extends StatefulWidget {
@@ -71,6 +73,9 @@ class _HomeState extends State<Home> {
         Provider.of<YoutubeProvider>(context).popularVideos;
     List<Items>? items = popularVideosResponse?.items;
 
+    PlayerProvider playerProvider = Provider.of<PlayerProvider>(context);
+    PlayingVideoModal currentVideo = playerProvider.currentVideo;
+
     if (items == null) {
       return Container();
     }
@@ -122,74 +127,87 @@ class _HomeState extends State<Home> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: MyConst.CONTAINER_PADDING,
-                          vertical: 8.0,
+                          vertical: 6.0,
                         ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(2.0),
-                                    child: Image.network(
-                                      items[index]
-                                          .snippet!
-                                          .thumbnails!
-                                          .def!
-                                          .url!,
-                                      height: 44,
-                                      width: 44,
-                                      fit: BoxFit.cover,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: currentVideo.id == items[index].id
+                                ? COLOR_C
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12.0,
+                            vertical: 8.0,
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(4.0),
+                                      child: Image.network(
+                                        items[index]
+                                            .snippet!
+                                            .thumbnails!
+                                            .def!
+                                            .url!,
+                                        height: 44,
+                                        width: 44,
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(
-                                    width: 12,
-                                  ),
-                                  Expanded(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          items[index].snippet!.title!,
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        const SizedBox(
-                                          height: 4,
-                                        ),
-                                        Text(
-                                          items[index].snippet!.channelTitle!,
-                                          style: const TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                        ),
-                                      ],
+                                    const SizedBox(
+                                      width: 18,
                                     ),
-                                  ),
-                                ],
+                                    Expanded(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            items[index].snippet!.title!,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          const SizedBox(
+                                            height: 4,
+                                          ),
+                                          Text(
+                                            items[index].snippet!.channelTitle!,
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            // const SizedBox(
-                            //   width: 8.0,
-                            // ),
-                            // IconButton(
-                            //   icon: const Icon(
-                            //     Icons.play_arrow,
-                            //   ),
-                            //   onPressed: () {},
-                            // ),
-                          ],
+                              const SizedBox(
+                                width: 16.0,
+                              ),
+                              IconButton(
+                                iconSize: 22,
+                                icon: const Icon(
+                                  Icons.more_vert,
+                                ),
+                                onPressed: () {},
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sleeptube/utils/color.dart';
 import 'package:sleeptube/utils/constants.dart';
 
 class Logo extends StatelessWidget {
@@ -15,7 +16,7 @@ class Logo extends StatelessWidget {
           width: 30,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(2),
-            color: MyConst.MAIN_COLOR,
+            color: COLOR_C,
           ),
           padding: const EdgeInsets.all(2.0),
           child: const Icon(
@@ -38,7 +39,7 @@ class Logo extends StatelessWidget {
         Text(
           "TUBE",
           style: TextStyle(
-            color: MyConst.LIGHT_MAIN_COLOR,
+            color: COLOR_A,
             fontSize: 18,
             fontWeight: FontWeight.bold,
             letterSpacing: 1.4,

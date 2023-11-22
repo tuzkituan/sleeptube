@@ -1,56 +1,54 @@
 import 'package:flutter/material.dart';
 
-class SearchInput extends StatefulWidget {
-  @override
-  _SearchInputState createState() => _SearchInputState();
-}
+class SearchInput extends StatelessWidget {
+  final void Function(String)? onFinish;
+  final TextEditingController controller;
 
-class _SearchInputState extends State<SearchInput> {
-  final TextEditingController _controller = TextEditingController();
+  SearchInput({Key? key, required this.controller, this.onFinish})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: _controller,
+      controller: controller,
       decoration: InputDecoration(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
         hintText: 'Search...',
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(2),
+          borderRadius: BorderRadius.circular(27),
           borderSide: BorderSide(
             color: Colors.grey[900]!,
             width: 2,
           ),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(2),
+          borderRadius: BorderRadius.circular(27),
           borderSide: BorderSide(
             color: Colors.grey[900]!,
             width: 2,
           ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(2),
+          borderRadius: BorderRadius.circular(27),
           borderSide: BorderSide(
             color: Colors.grey[900]!,
             width: 2,
           ),
         ),
         suffixIcon: Container(
-          margin: const EdgeInsets.only(top: 4, bottom: 4, right: 8),
+          margin: const EdgeInsets.only(top: 4, bottom: 4, right: 4),
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.all(
-              Radius.circular(2),
+              Radius.circular(30),
             ),
             color: Colors.grey[900],
           ),
           padding: EdgeInsets.zero,
           child: GestureDetector(
             onTap: () {
-              // Handle the submit button click
-              String searchValue = _controller.text;
-              // Do something with the search value
-              print(searchValue);
+              String searchValue = controller.text;
+              controller.text = searchValue;
+              onFinish!(searchValue);
             },
             child: const Icon(
               Icons.search,
@@ -60,10 +58,10 @@ class _SearchInputState extends State<SearchInput> {
           ),
         ),
       ),
-      // onChanged: (value) {
-      //   // Do something with the search value
-      //   print(value);
-      // },
+      onSubmitted: (String value) {
+        controller.text = value;
+        onFinish!(value);
+      },
     );
   }
 }

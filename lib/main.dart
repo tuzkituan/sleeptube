@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:sleeptube/components/logo/logo.dart';
 import 'package:sleeptube/models/PlayingVideoModel.dart';
 import 'package:sleeptube/providers/player_provider.dart';
 import 'package:sleeptube/providers/youtube_provider.dart';
@@ -15,17 +14,17 @@ import 'package:sleeptube/views/home/home.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarBrightness: Brightness.dark,
     statusBarIconBrightness: Brightness.dark,
-    systemNavigationBarIconBrightness: Brightness.light,
-    systemNavigationBarColor: Colors.transparent,
+    systemNavigationBarIconBrightness: Brightness.dark,
+    systemNavigationBarColor: COLOR_BLACK,
     systemNavigationBarDividerColor: Colors.transparent,
   ));
 
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge,
-      overlays: [SystemUiOverlay.top]);
+  // SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge,
+  //     overlays: [SystemUiOverlay.top]);
 
   runApp(
     MultiProvider(
@@ -103,35 +102,41 @@ class _MyAppState extends State<MyApp> {
       themeMode: ThemeMode.system,
       scrollBehavior: NoThumbScrollBehavior(),
       home: Scaffold(
+        // appBar: AppBar(
+        //   backgroundColor: Colors.black,
+        //   foregroundColor: Colors.white,
+        //   scrolledUnderElevation: 0.0,
+        //   title: const Logo(),
+        //   centerTitle: false,
+        //   actions: [
+        //     Padding(
+        //       padding: const EdgeInsets.only(
+        //         right: MyConst.CONTAINER_PADDING,
+        //       ),
+        //       child: IconButton(
+        //         onPressed: () {},
+        //         iconSize: 20,
+        //         icon: const Icon(Icons.timer_outlined),
+        //       ),
+        //     ),
+        //   ],
+        // ),
         appBar: AppBar(
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white,
-          scrolledUnderElevation: 0.0,
-          title: const Logo(),
-          centerTitle: false,
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(
-                right: MyConst.CONTAINER_PADDING,
-              ),
-              child: IconButton(
-                onPressed: () {},
-                iconSize: 20,
-                icon: const Icon(Icons.timer_outlined),
-              ),
-            ),
-          ],
+          elevation: 0,
+          toolbarHeight: 0,
+          backgroundColor: Colors.transparent,
         ),
+        extendBodyBehindAppBar: false,
         bottomNavigationBar: playerProvider.isLoaded
             ? Container(
                 height: 74,
                 decoration: BoxDecoration(
-                  color: COLOR_D,
+                  color: COLOR_BLACK,
                 ),
                 child: Column(
                   children: [
                     Transform.translate(
-                      offset: const Offset(0, -4),
+                      offset: const Offset(0, 0),
                       child: StreamBuilder(
                           stream: playerProvider.audioPlayer.positionStream,
                           builder: (context, snapshot1) {
@@ -156,11 +161,11 @@ class _MyAppState extends State<MyApp> {
                                     buffered: bufferedDuration,
                                     timeLabelLocation: TimeLabelLocation.none,
                                     progressBarColor: COLOR_A,
-                                    baseBarColor: Colors.grey[600],
+                                    baseBarColor: Colors.grey[900],
                                     bufferedBarColor: COLOR_C,
                                     thumbColor: COLOR_A,
                                     barHeight: 2,
-                                    thumbRadius: 6,
+                                    thumbRadius: 0,
                                     onSeek: playerProvider.isLoaded
                                         ? (duration) async {
                                             await playerProvider.audioPlayer
@@ -177,7 +182,7 @@ class _MyAppState extends State<MyApp> {
                           left: MyConst.CONTAINER_PADDING,
                           right: MyConst.CONTAINER_PADDING,
                           top: 0.0,
-                          bottom: 8.0,
+                          bottom: 0.0,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -186,17 +191,19 @@ class _MyAppState extends State<MyApp> {
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
                                     currentVideo.title ?? "Unknown",
                                     style: const TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                       // color: MyConst.LIGHT_MAIN_COLOR,
                                     ),
                                     overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(
+                                    height: 4,
                                   ),
                                   Text(
                                     currentVideo.author ?? "Unknown",

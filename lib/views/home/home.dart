@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sleeptube/components/search_input/search_input.dart';
+import 'package:sleeptube/components/video_item/video_item.dart';
 import 'package:sleeptube/models/PlayingVideoModel.dart';
 import 'package:sleeptube/models/PopularVideosResponse.dart';
+import 'package:sleeptube/models/SearchResponse.dart';
 import 'package:sleeptube/providers/player_provider.dart';
 import 'package:sleeptube/providers/youtube_provider.dart';
-import 'package:sleeptube/utils/color.dart';
 import 'package:sleeptube/utils/constants.dart';
 
 class Home extends StatefulWidget {
@@ -16,6 +17,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final TextEditingController _controller = TextEditingController();
   ScrollController _scrollController = ScrollController();
   bool _isLoading = false;
 
@@ -61,24 +63,114 @@ class _HomeState extends State<Home> {
     // }
   }
 
-  void onSelectVideo(Items item) async {
+  void onSelectVideo(String id) async {
+    print("id: $id");
     PlayerProvider playerProvider =
         Provider.of<PlayerProvider>(context, listen: false);
-    playerProvider.onStartPlay(item);
+    playerProvider.onStartPlay(id);
+  }
+
+  void onSearch(String searchValue) {
+    final youtubeProvider =
+        Provider.of<YoutubeProvider>(context, listen: false);
+    youtubeProvider.searchVideo({
+      "part": "snippet",
+      "maxResults": "15",
+      "q": searchValue,
+    });
+  }
+
+  Widget renderPopularList(List<PopularItems> items, String? playingId) {
+    return ListView.separated(
+      controller: _scrollController,
+      itemCount: items.length + 1,
+      shrinkWrap: true,
+      // physics: const NeverScrollableScrollPhysics(),
+      separatorBuilder: (context, index) {
+        return Divider(
+          thickness: 1,
+          height: 1,
+          color: Colors.grey[900],
+        );
+      },
+      itemBuilder: (context, index) {
+        if (index < items.length) {
+          return VideoItem(
+            onTap: onSelectVideo,
+            isPlaying: playingId != null && playingId == items[index].id,
+            id: items[index].id!,
+            author: items[index].snippet!.channelTitle,
+            thumbnailUrl: items[index].snippet!.thumbnails!.standard!.url,
+            title: items[index].snippet!.title,
+          );
+        } else {
+          // Show a loading indicator at the end of the list
+          return _isLoading
+              ? const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : const SizedBox();
+        }
+      },
+    );
+  }
+
+  Widget renderSearchList(List<SearchItems> items, String? playingId) {
+    return ListView.separated(
+      controller: _scrollController,
+      itemCount: items.length + 1,
+      shrinkWrap: true,
+      // physics: const NeverScrollableScrollPhysics(),
+      separatorBuilder: (context, index) {
+        return Divider(
+          thickness: 1,
+          height: 1,
+          color: Colors.grey[900],
+        );
+      },
+      itemBuilder: (context, index) {
+        if (index < items.length) {
+          return VideoItem(
+            onTap: onSelectVideo,
+            isPlaying:
+                playingId != null && playingId == items[index].id!.videoId,
+            id: items[index].id!.videoId ?? "",
+            author: items[index].snippet!.channelTitle,
+            thumbnailUrl: items[index].snippet!.thumbnails!.def!.url ?? "",
+            title: items[index].snippet!.title,
+          );
+        } else {
+          // Show a loading indicator at the end of the list
+          return _isLoading
+              ? const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : const SizedBox();
+        }
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     PopularVideosResponse? popularVideosResponse =
         Provider.of<YoutubeProvider>(context).popularVideos;
-    List<Items>? items = popularVideosResponse?.items;
+    List<PopularItems>? items = popularVideosResponse?.items;
+    SearchResponse? searchResponse =
+        Provider.of<YoutubeProvider>(context).searchVideos;
+    List<SearchItems>? searchItems = searchResponse?.items;
+    bool? isSearching = Provider.of<YoutubeProvider>(context).isSearching;
 
     PlayerProvider playerProvider = Provider.of<PlayerProvider>(context);
     PlayingVideoModal currentVideo = playerProvider.currentVideo;
+    String? playingId = currentVideo.id;
 
-    if (items == null) {
-      return Container();
-    }
     return Column(
       children: [
         Flexible(
@@ -90,140 +182,32 @@ class _HomeState extends State<Home> {
                 padding: const EdgeInsets.only(
                   left: MyConst.CONTAINER_PADDING,
                   right: MyConst.CONTAINER_PADDING,
-                  bottom: 8.0,
-                  top: 4.0,
+                  bottom: MyConst.CONTAINER_PADDING,
+                  top: MyConst.CONTAINER_PADDING,
                 ),
-                child: SearchInput(),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: MyConst.CONTAINER_PADDING,
-                  vertical: MyConst.CONTAINER_PADDING / 2,
-                ),
-                child: Text(
-                  "Popular Videos",
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                child: SearchInput(
+                  controller: _controller,
+                  onFinish: onSearch,
                 ),
               ),
-              ListView.separated(
-                controller: _scrollController,
-                itemCount: items.length + 1,
-                shrinkWrap: true,
-                // physics: const NeverScrollableScrollPhysics(),
-                separatorBuilder: (context, index) {
-                  return Divider(
-                    thickness: 1,
-                    height: 1,
-                    color: Colors.grey[900],
-                  );
-                },
-                itemBuilder: (context, index) {
-                  if (index < items.length) {
-                    return GestureDetector(
-                      onTap: () => onSelectVideo(items[index]),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: MyConst.CONTAINER_PADDING,
-                          vertical: 6.0,
+              if (isSearching == false)
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: MyConst.CONTAINER_PADDING,
+                    vertical: MyConst.CONTAINER_PADDING / 2,
+                  ),
+                  child: Text(
+                    "Popular Videos",
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: currentVideo.id == items[index].id
-                                ? COLOR_C
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12.0,
-                            vertical: 8.0,
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(4.0),
-                                      child: Image.network(
-                                        items[index]
-                                            .snippet!
-                                            .thumbnails!
-                                            .def!
-                                            .url!,
-                                        height: 44,
-                                        width: 44,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 18,
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            items[index].snippet!.title!,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          const SizedBox(
-                                            height: 4,
-                                          ),
-                                          Text(
-                                            items[index].snippet!.channelTitle!,
-                                            style: const TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w400,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 16.0,
-                              ),
-                              IconButton(
-                                iconSize: 22,
-                                icon: const Icon(
-                                  Icons.more_vert,
-                                ),
-                                onPressed: () {},
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  } else {
-                    // Show a loading indicator at the end of the list
-                    return _isLoading
-                        ? const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16),
-                            child: Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          )
-                        : const SizedBox();
-                  }
-                },
-              ),
+                  ),
+                ),
+              if (searchItems != null)
+                renderSearchList(searchItems, playingId)
+              else if (items != null)
+                renderPopularList(items, playingId)
             ],
           ),
         )

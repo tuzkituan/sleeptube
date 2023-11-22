@@ -1,7 +1,7 @@
 class PopularVideosResponse {
   String? kind;
   String? etag;
-  List<Items>? items;
+  List<PopularItems>? items;
   String? nextPageToken;
   PageInfo? pageInfo;
 
@@ -12,9 +12,9 @@ class PopularVideosResponse {
     kind = json['kind'];
     etag = json['etag'];
     if (json['items'] != null) {
-      items = <Items>[];
+      items = <PopularItems>[];
       json['items'].forEach((v) {
-        items!.add(Items.fromJson(v));
+        items!.add(PopularItems.fromJson(v));
       });
     }
     nextPageToken = json['nextPageToken'];
@@ -37,20 +37,40 @@ class PopularVideosResponse {
   }
 }
 
-class Items {
+class PageInfo {
+  int? totalResults;
+  int? resultsPerPage;
+
+  PageInfo({this.totalResults, this.resultsPerPage});
+
+  PageInfo.fromJson(Map<String, dynamic> json) {
+    totalResults = json['totalResults'];
+    resultsPerPage = json['resultsPerPage'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['totalResults'] = totalResults;
+    data['resultsPerPage'] = resultsPerPage;
+    return data;
+  }
+}
+
+class PopularItems {
   String? kind;
   String? etag;
   String? id;
-  Snippet? snippet;
+  PopularSnippet? snippet;
 
-  Items({this.kind, this.etag, this.id, this.snippet});
+  PopularItems({this.kind, this.etag, this.id, this.snippet});
 
-  Items.fromJson(Map<String, dynamic> json) {
+  PopularItems.fromJson(Map<String, dynamic> json) {
     kind = json['kind'];
     etag = json['etag'];
     id = json['id'];
-    snippet =
-        json['snippet'] != null ? Snippet.fromJson(json['snippet']) : null;
+    snippet = json['snippet'] != null
+        ? PopularSnippet.fromJson(json['snippet'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -65,21 +85,21 @@ class Items {
   }
 }
 
-class Snippet {
+class PopularSnippet {
   String? publishedAt;
   String? channelId;
   String? title;
   String? description;
-  Thumbnails? thumbnails;
+  PopularThumbnails? thumbnails;
   String? channelTitle;
   List<String>? tags;
   String? categoryId;
   String? liveBroadcastContent;
-  Localized? localized;
+  PopularLocalized? localized;
   String? defaultAudioLanguage;
   String? defaultLanguage;
 
-  Snippet(
+  PopularSnippet(
       {this.publishedAt,
       this.channelId,
       this.title,
@@ -93,13 +113,13 @@ class Snippet {
       this.defaultAudioLanguage,
       this.defaultLanguage});
 
-  Snippet.fromJson(Map<String, dynamic> json) {
+  PopularSnippet.fromJson(Map<String, dynamic> json) {
     publishedAt = json['publishedAt'];
     channelId = json['channelId'];
     title = json['title'];
     description = json['description'];
     thumbnails = json['thumbnails'] != null
-        ? Thumbnails.fromJson(json['thumbnails'])
+        ? PopularThumbnails.fromJson(json['thumbnails'])
         : null;
     channelTitle = json['channelTitle'];
     if (json['tags'] != null) {
@@ -108,7 +128,7 @@ class Snippet {
     categoryId = json['categoryId'];
     liveBroadcastContent = json['liveBroadcastContent'];
     localized = json['localized'] != null
-        ? Localized.fromJson(json['localized'])
+        ? PopularLocalized.fromJson(json['localized'])
         : null;
     defaultAudioLanguage = json['defaultAudioLanguage'];
     defaultLanguage = json['defaultLanguage'];
@@ -136,29 +156,31 @@ class Snippet {
   }
 }
 
-class Thumbnails {
-  ThumbnailVariant? def;
-  ThumbnailVariant? medium;
-  ThumbnailVariant? high;
-  ThumbnailVariant? standard;
-  ThumbnailVariant? maxres;
+class PopularThumbnails {
+  PopularThumbnailVariant? def;
+  PopularThumbnailVariant? medium;
+  PopularThumbnailVariant? high;
+  PopularThumbnailVariant? standard;
+  PopularThumbnailVariant? maxres;
 
-  Thumbnails({this.def, this.medium, this.high, this.standard, this.maxres});
+  PopularThumbnails(
+      {this.def, this.medium, this.high, this.standard, this.maxres});
 
-  Thumbnails.fromJson(Map<String, dynamic> json) {
+  PopularThumbnails.fromJson(Map<String, dynamic> json) {
     def = json['default'] != null
-        ? ThumbnailVariant.fromJson(json['default'])
+        ? PopularThumbnailVariant.fromJson(json['default'])
         : null;
     medium = json['medium'] != null
-        ? ThumbnailVariant.fromJson(json['medium'])
+        ? PopularThumbnailVariant.fromJson(json['medium'])
         : null;
-    high =
-        json['high'] != null ? ThumbnailVariant.fromJson(json['high']) : null;
+    high = json['high'] != null
+        ? PopularThumbnailVariant.fromJson(json['high'])
+        : null;
     standard = json['standard'] != null
-        ? ThumbnailVariant.fromJson(json['standard'])
+        ? PopularThumbnailVariant.fromJson(json['standard'])
         : null;
     maxres = json['maxres'] != null
-        ? ThumbnailVariant.fromJson(json['maxres'])
+        ? PopularThumbnailVariant.fromJson(json['maxres'])
         : null;
   }
 
@@ -183,14 +205,14 @@ class Thumbnails {
   }
 }
 
-class ThumbnailVariant {
+class PopularThumbnailVariant {
   String? url;
   int? width;
   int? height;
 
-  ThumbnailVariant({this.url, this.width, this.height});
+  PopularThumbnailVariant({this.url, this.width, this.height});
 
-  ThumbnailVariant.fromJson(Map<String, dynamic> json) {
+  PopularThumbnailVariant.fromJson(Map<String, dynamic> json) {
     url = json['url'];
     width = json['width'];
     height = json['height'];
@@ -205,13 +227,13 @@ class ThumbnailVariant {
   }
 }
 
-class Localized {
+class PopularLocalized {
   String? title;
   String? description;
 
-  Localized({this.title, this.description});
+  PopularLocalized({this.title, this.description});
 
-  Localized.fromJson(Map<String, dynamic> json) {
+  PopularLocalized.fromJson(Map<String, dynamic> json) {
     title = json['title'];
     description = json['description'];
   }
@@ -220,25 +242,6 @@ class Localized {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['title'] = title;
     data['description'] = description;
-    return data;
-  }
-}
-
-class PageInfo {
-  int? totalResults;
-  int? resultsPerPage;
-
-  PageInfo({this.totalResults, this.resultsPerPage});
-
-  PageInfo.fromJson(Map<String, dynamic> json) {
-    totalResults = json['totalResults'];
-    resultsPerPage = json['resultsPerPage'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['totalResults'] = totalResults;
-    data['resultsPerPage'] = resultsPerPage;
     return data;
   }
 }

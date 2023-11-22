@@ -7,4 +7,5 @@ class MyConst {
   static const double CONTAINER_PADDING = 16.0;
   static final Color MAIN_COLOR = Colors.deepOrange[900]!;
   static final Color LIGHT_MAIN_COLOR = Colors.deepOrange[400]!;
+  static final double BOTTOM_SPACE = 140;
 }

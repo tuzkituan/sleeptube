@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sleeptube/components/search_input/search_input.dart';
 import 'package:sleeptube/components/video_item/video_item.dart';
 import 'package:sleeptube/models/PlayingVideoModel.dart';
 import 'package:sleeptube/models/PopularVideosResponse.dart';
 import 'package:sleeptube/models/SearchResponse.dart';
 import 'package:sleeptube/providers/player_provider.dart';
 import 'package:sleeptube/providers/youtube_provider.dart';
-import 'package:sleeptube/utils/constants.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -17,7 +15,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final TextEditingController _controller = TextEditingController();
   ScrollController _scrollController = ScrollController();
   bool _isLoading = false;
 
@@ -85,7 +82,7 @@ class _HomeState extends State<Home> {
       controller: _scrollController,
       itemCount: items.length + 1,
       shrinkWrap: true,
-      // physics: const NeverScrollableScrollPhysics(),
+      physics: const AlwaysScrollableScrollPhysics(),
       separatorBuilder: (context, index) {
         return Divider(
           thickness: 1,
@@ -123,7 +120,7 @@ class _HomeState extends State<Home> {
       controller: _scrollController,
       itemCount: items.length + 1,
       shrinkWrap: true,
-      // physics: const NeverScrollableScrollPhysics(),
+      physics: const AlwaysScrollableScrollPhysics(),
       separatorBuilder: (context, index) {
         return Divider(
           thickness: 1,
@@ -172,45 +169,42 @@ class _HomeState extends State<Home> {
     String? playingId = currentVideo.id;
 
     return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Flexible(
-          child: ListView(
-            shrinkWrap: true,
-            physics: const AlwaysScrollableScrollPhysics(),
-            children: [
-              Container(
-                padding: const EdgeInsets.only(
-                  left: MyConst.CONTAINER_PADDING,
-                  right: MyConst.CONTAINER_PADDING,
-                  bottom: MyConst.CONTAINER_PADDING,
-                  top: MyConst.CONTAINER_PADDING,
-                ),
-                child: SearchInput(
-                  controller: _controller,
-                  onFinish: onSearch,
-                ),
-              ),
-              if (isSearching == false)
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: MyConst.CONTAINER_PADDING,
-                    vertical: MyConst.CONTAINER_PADDING / 2,
-                  ),
-                  child: Text(
-                    "Popular Videos",
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                ),
-              if (searchItems != null)
-                renderSearchList(searchItems, playingId)
-              else if (items != null)
-                renderPopularList(items, playingId)
-            ],
-          ),
-        )
+        // Container(
+        //   padding: const EdgeInsets.only(
+        //     left: MyConst.CONTAINER_PADDING * 3 / 4,
+        //     right: MyConst.CONTAINER_PADDING * 3 / 4,
+        //     bottom: MyConst.CONTAINER_PADDING / 2,
+        //     top: MyConst.CONTAINER_PADDING,
+        //   ),
+        //   child: SearchInput(
+        //     controller: _controller,
+        //     onFinish: onSearch,
+        //   ),
+        // ),
+        // if (isSearching == false)
+        //   Padding(
+        //     padding: const EdgeInsets.symmetric(
+        //       horizontal: MyConst.CONTAINER_PADDING,
+        //       vertical: MyConst.CONTAINER_PADDING,
+        //     ),
+        //     child: Text(
+        //       "Popular Videos",
+        //       style: Theme.of(context).textTheme.titleLarge?.copyWith(
+        //             color: Colors.white,
+        //             fontWeight: FontWeight.bold,
+        //           ),
+        //     ),
+        //   ),
+        Expanded(
+          child: (searchItems != null)
+              ? renderSearchList(searchItems, playingId)
+              : (items != null)
+                  ? renderPopularList(items, playingId)
+                  : Container(),
+        ),
       ],
     );
   }

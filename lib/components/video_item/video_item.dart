@@ -30,7 +30,9 @@ class VideoItem extends StatelessWidget {
         ),
         child: Container(
           decoration: BoxDecoration(
-            color: isPlaying == true ? COLOR_C : Colors.transparent,
+            color: isPlaying == true
+                ? COLOR_D.withOpacity(0.4)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(8.0),
           ),
           padding: const EdgeInsets.symmetric(
@@ -70,9 +72,10 @@ class VideoItem extends StatelessWidget {
                         children: [
                           Text(
                             title ?? "",
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
+                              color: isPlaying == true ? COLOR_A : Colors.white,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),

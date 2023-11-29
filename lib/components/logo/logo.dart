@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sleeptube/utils/color.dart';
 import 'package:sleeptube/utils/constants.dart';
 
@@ -13,10 +14,12 @@ class Logo extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 30,
+          width: 24,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(2),
-            color: COLOR_C,
+            borderRadius: const BorderRadius.all(
+              Radius.circular(30),
+            ),
+            color: COLOR_E,
           ),
           padding: const EdgeInsets.all(2.0),
           child: const Icon(
@@ -28,23 +31,26 @@ class Logo extends StatelessWidget {
         const SizedBox(
           width: 8,
         ),
-        const Text(
-          "SLEEP",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.4,
-          ),
-        ),
         Text(
-          "TUBE",
+          "Music",
           style: TextStyle(
-            color: COLOR_B,
-            fontSize: 16,
+            fontSize: 24,
             fontWeight: FontWeight.bold,
             letterSpacing: 1.4,
+            fontFamily: GoogleFonts.oswaldTextTheme().labelMedium?.fontFamily,
           ),
         ),
+        // Text(
+        //   "TUBE",
+        //   style: TextStyle(
+        //     color: COLOR_A,
+        //     fontSize: 24,
+        //     fontWeight: FontWeight.bold,
+        //     letterSpacing: 1.4,
+        //     fontFamily:
+        //         GoogleFonts.robotoCondensedTextTheme().labelMedium?.fontFamily,
+        //   ),
+        // ),
       ],
     );
   }

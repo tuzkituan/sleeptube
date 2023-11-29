@@ -10,17 +10,17 @@ import 'package:sleeptube/utils/constants.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: COLOR_BLACK,
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
     statusBarBrightness: Brightness.dark,
     statusBarIconBrightness: Brightness.dark,
     systemNavigationBarIconBrightness: Brightness.dark,
-    systemNavigationBarColor: Colors.black,
+    systemNavigationBarColor: Colors.transparent,
     systemNavigationBarDividerColor: Colors.transparent,
   ));
 
-  // SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge,
-  //     overlays: [SystemUiOverlay.top]);
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge,
+      overlays: [SystemUiOverlay.top]);
 
   runApp(
     MultiProvider(
@@ -37,7 +37,7 @@ ThemeData _buildTheme(brightness) {
   var baseTheme = ThemeData(brightness: brightness);
 
   return baseTheme.copyWith(
-    textTheme: GoogleFonts.interTextTheme(baseTheme.textTheme),
+    textTheme: GoogleFonts.poppinsTextTheme(baseTheme.textTheme),
     // canvasColor: Colors.black,
     scaffoldBackgroundColor: COLOR_BLACK,
   );

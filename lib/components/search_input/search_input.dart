@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 
 class SearchInput extends StatelessWidget {
   final void Function(String)? onFinish;
-  final TextEditingController controller;
+  final TextEditingController? controller;
 
-  SearchInput({Key? key, required this.controller, this.onFinish})
-      : super(key: key);
+  SearchInput({Key? key, this.controller, this.onFinish}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -46,8 +45,8 @@ class SearchInput extends StatelessWidget {
           padding: EdgeInsets.zero,
           child: GestureDetector(
             onTap: () {
-              String searchValue = controller.text;
-              controller.text = searchValue;
+              String searchValue = controller!.text;
+              controller!.text = searchValue;
               onFinish!(searchValue);
             },
             child: const Icon(
@@ -59,7 +58,7 @@ class SearchInput extends StatelessWidget {
         ),
       ),
       onSubmitted: (String value) {
-        controller.text = value;
+        controller!.text = value;
         onFinish!(value);
       },
     );

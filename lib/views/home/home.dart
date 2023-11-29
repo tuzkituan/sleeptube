@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sleeptube/components/logo/logo.dart';
+import 'package:sleeptube/components/search_input/search_input.dart';
+import 'package:sleeptube/components/tag/tag.dart';
 import 'package:sleeptube/components/video_item/video_item.dart';
 import 'package:sleeptube/models/PlayingVideoModel.dart';
 import 'package:sleeptube/models/PopularVideosResponse.dart';
@@ -61,15 +64,14 @@ class _HomeState extends State<Home> {
   Widget renderPopularList(
       List<PopularItems> items, String? playingId, bool? isLoading) {
     return ListView.separated(
-      controller: _scrollController,
       itemCount: items.length + 1,
       shrinkWrap: true,
-      physics: const AlwaysScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       separatorBuilder: (context, index) {
-        return Divider(
+        return const Divider(
           thickness: 1,
           height: 1,
-          color: COLOR_E,
+          color: Colors.transparent,
         );
       },
       itemBuilder: (context, index) {
@@ -151,16 +153,101 @@ class _HomeState extends State<Home> {
     PlayingVideoModal currentVideo = playerProvider.currentVideo;
     String? playingId = currentVideo.id;
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: (items != null)
-              ? renderPopularList(items, playingId, isLoading)
-              : Container(),
+    List<String> tags = [
+      "Popular",
+      "Latest",
+      "Trending",
+      "Popular",
+      "Latest",
+      "Trending",
+      "Popular",
+      "Latest",
+      "Trending"
+    ];
+
+    return Container(
+      padding: const EdgeInsets.only(
+        top: MyConst.CONTAINER_PADDING * 2,
+      ),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[COLOR_C, COLOR_E],
+          stops: const [0, 0.6],
         ),
-      ],
+      ),
+      width: MediaQuery.of(context).size.width,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        controller: _scrollController,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: MyConst.CONTAINER_PADDING,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Logo(),
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.search,
+                      ),
+                    )
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Container(
+            height: 32,
+            width: MediaQuery.of(context).size.width,
+            margin: const EdgeInsets.symmetric(
+              vertical: MyConst.CONTAINER_PADDING / 2,
+              horizontal: MyConst.CONTAINER_PADDING,
+            ),
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: tags.length,
+              itemBuilder: (context, index) {
+                return Tag(
+                  onTap: () {},
+                  label: tags[index],
+                );
+              },
+              separatorBuilder: (context, index) {
+                return const SizedBox(
+                  width: 10,
+                );
+              },
+            ),
+          ),
+
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(
+          //     horizontal: MyConst.CONTAINER_PADDING,
+          //     vertical: MyConst.CONTAINER_PADDING,
+          //   ),
+          //   child: Text(
+          //     "Popular Videos".toUpperCase(),
+          //     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+          //           color: Colors.white,
+          //           fontWeight: FontWeight.bold,
+          //         ),
+          //   ),
+          // ),
+          Expanded(
+            child: (items != null)
+                ? renderPopularList(items, playingId, isLoading)
+                : Container(),
+          ),
+        ],
+      ),
     );
   }
 }

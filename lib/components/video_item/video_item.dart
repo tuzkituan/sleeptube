@@ -31,13 +31,15 @@ class VideoItem extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             color: isPlaying == true
-                ? COLOR_D.withOpacity(0.4)
+                ? COLOR_C.withOpacity(0.4)
                 : Colors.transparent,
-            borderRadius: BorderRadius.circular(8.0),
+            borderRadius: BorderRadius.circular(6.0),
           ),
-          padding: const EdgeInsets.symmetric(
-            horizontal: 12.0,
-            vertical: 8.0,
+          padding: const EdgeInsets.only(
+            left: 12.0,
+            top: 8.0,
+            bottom: 8.0,
+            right: 0,
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -50,17 +52,17 @@ class VideoItem extends StatelessWidget {
                   children: [
                     thumbnailUrl != null
                         ? ClipRRect(
-                            borderRadius: BorderRadius.circular(4.0),
+                            borderRadius: BorderRadius.circular(2.0),
                             child: Image.network(
                               thumbnailUrl!,
                               height: 44,
-                              width: 44,
+                              width: 60,
                               fit: BoxFit.cover,
                             ),
                           )
                         : const SizedBox(
-                            width: 44,
                             height: 44,
+                            width: 60,
                           ),
                     const SizedBox(
                       width: 18,

@@ -31,7 +31,7 @@ class Logo extends StatelessWidget {
         const Text(
           "SLEEP",
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
             letterSpacing: 1.4,
           ),
@@ -39,8 +39,8 @@ class Logo extends StatelessWidget {
         Text(
           "TUBE",
           style: TextStyle(
-            color: COLOR_A,
-            fontSize: 18,
+            color: COLOR_B,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
             letterSpacing: 1.4,
           ),

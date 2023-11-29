@@ -6,18 +6,34 @@ import 'package:sleeptube/services/youtube_service.dart';
 class YoutubeProvider with ChangeNotifier {
   final YoutubeService _youtubeService = YoutubeService();
 
-  PopularVideosResponse? popularVideos;
+  PopularVideosResponse? popularVideoResponse;
+  String nextPageToken = "";
+  bool? popularVideoLoading = false;
+
   SearchResponse? searchVideos;
   bool? isSearching = false;
 
-  Future<void> getPopularVideo(params) async {
+  Future<void> getPopularVideo(
+      {required Map<String, dynamic> params, bool isLoadMore = false}) async {
+    popularVideoLoading = true;
+
     try {
       notifyListeners();
-      dynamic response = await _youtubeService.getPopularVideo(params);
+      Map<String, dynamic> finalParams = isLoadMore && nextPageToken.isNotEmpty
+          ? {"pageToken": nextPageToken, ...params}
+          : params;
+
+      dynamic response = await _youtubeService.getPopularVideo(finalParams);
       notifyListeners();
-      // print("response: $response");
       if (response != null) {
-        popularVideos = PopularVideosResponse.fromJson(response);
+        PopularVideosResponse temp = PopularVideosResponse.fromJson(response);
+        print("nextPageToken: ${temp.nextPageToken}");
+        if (!isLoadMore) {
+          popularVideoResponse = temp;
+        } else {
+          popularVideoResponse!.items!.addAll(temp.items!);
+        }
+        nextPageToken = temp.nextPageToken ?? "";
         searchVideos = null;
         isSearching = false;
         notifyListeners();
@@ -26,6 +42,7 @@ class YoutubeProvider with ChangeNotifier {
       print("error: $e");
       rethrow;
     }
+    popularVideoLoading = false;
   }
 
   Future<void> searchVideo(params) async {

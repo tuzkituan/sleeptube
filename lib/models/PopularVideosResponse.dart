@@ -3,10 +3,16 @@ class PopularVideosResponse {
   String? etag;
   List<PopularItems>? items;
   String? nextPageToken;
+  String? prevPageToken;
   PageInfo? pageInfo;
 
   PopularVideosResponse(
-      {this.kind, this.etag, this.items, this.nextPageToken, this.pageInfo});
+      {this.kind,
+      this.etag,
+      this.items,
+      this.nextPageToken,
+      this.prevPageToken,
+      this.pageInfo});
 
   PopularVideosResponse.fromJson(Map<String, dynamic> json) {
     kind = json['kind'];
@@ -18,6 +24,7 @@ class PopularVideosResponse {
       });
     }
     nextPageToken = json['nextPageToken'];
+    prevPageToken = json['prevPageToken'];
     pageInfo =
         json['pageInfo'] != null ? PageInfo.fromJson(json['pageInfo']) : null;
   }
@@ -30,6 +37,7 @@ class PopularVideosResponse {
       data['items'] = items!.map((v) => v.toJson()).toList();
     }
     data['nextPageToken'] = nextPageToken;
+    data['prevPageToken'] = prevPageToken;
     if (pageInfo != null) {
       data['pageInfo'] = pageInfo!.toJson();
     }

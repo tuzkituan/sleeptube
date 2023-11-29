@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sleeptube/components/logo/logo.dart';
@@ -18,24 +19,33 @@ class Layout extends StatefulWidget {
 }
 
 class _LayoutState extends State<Layout> {
-  Future<void> getData() async {
+  Future<void> getData({
+    bool isLoadMore = false,
+  }) async {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final youtubeProvider =
           Provider.of<YoutubeProvider>(context, listen: false);
-      youtubeProvider.getPopularVideo({
-        "part": "snippet",
-        "chart": "mostPopular",
-        "regionCode": "vn",
-        "maxResults": "15",
-        "videoCategoryId": "10"
-      });
+      youtubeProvider.getPopularVideo(
+        params: {
+          "part": "snippet",
+          "chart": "mostPopular",
+          "regionCode": "vn",
+          "maxResults": "15",
+          "videoCategoryId": "10"
+        },
+        isLoadMore: isLoadMore,
+      );
     });
+  }
+
+  Future<void> onLoadMore() async {
+    getData(isLoadMore: true);
   }
 
   @override
   void initState() {
     super.initState();
-    getData();
+    getData(isLoadMore: false);
   }
 
   Widget renderMediaButton(IconData icon, void Function()? onPressed) {
@@ -61,7 +71,7 @@ class _LayoutState extends State<Layout> {
     return Scaffold(
       extendBody: true,
       appBar: AppBar(
-        backgroundColor: COLOR_E,
+        backgroundColor: COLOR_BLACK,
         foregroundColor: Colors.white,
         scrolledUnderElevation: 0.0,
         title: const Logo(),
@@ -69,7 +79,7 @@ class _LayoutState extends State<Layout> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(
-              right: MyConst.CONTAINER_PADDING,
+              right: MyConst.CONTAINER_PADDING / 2,
             ),
             child: IconButton(
               onPressed: () {
@@ -82,149 +92,134 @@ class _LayoutState extends State<Layout> {
         ],
       ),
       extendBodyBehindAppBar: false,
-      body: Stack(
-        children: [
-          const Home(),
-          Positioned(
-            bottom: MyConst.CONTAINER_PADDING,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 70,
+      bottomNavigationBar: playerProvider.isLoaded
+          ? Container(
+              height: 96,
               decoration: BoxDecoration(
-                color: COLOR_D,
-                borderRadius: BorderRadius.circular(16.0),
+                color: COLOR_E,
               ),
-              margin: const EdgeInsets.symmetric(
-                horizontal: MyConst.CONTAINER_PADDING / 2,
-                vertical: MyConst.CONTAINER_PADDING / 2,
-              ),
+              padding: EdgeInsets.zero,
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Transform.translate(
-                  //   offset: const Offset(0, 0),
-                  //   child: StreamBuilder(
-                  //       stream:
-                  //           playerProvider.audioPlayer.positionStream,
-                  //       builder: (context, snapshot1) {
-                  //         final Duration duration =
-                  //             playerProvider.isLoaded &&
-                  //                     snapshot1.hasData
-                  //                 ? snapshot1.data as Duration
-                  //                 : const Duration(seconds: 0);
-                  //         return StreamBuilder(
-                  //             stream: playerProvider
-                  //                 .audioPlayer.bufferedPositionStream,
-                  //             builder: (context, snapshot2) {
-                  //               final Duration bufferedDuration =
-                  //                   playerProvider.isLoaded &&
-                  //                           snapshot2.hasData
-                  //                       ? snapshot2.data as Duration
-                  //                       : const Duration(seconds: 0);
-                  //               return ProgressBar(
-                  //                 progress: duration,
-                  //                 total: playerProvider
-                  //                         .audioPlayer.duration ??
-                  //                     const Duration(seconds: 0),
-                  //                 buffered: bufferedDuration,
-                  //                 timeLabelLocation:
-                  //                     TimeLabelLocation.none,
-                  //                 progressBarColor: COLOR_A,
-                  //                 baseBarColor: Colors.grey[900],
-                  //                 bufferedBarColor: COLOR_C,
-                  //                 thumbColor: COLOR_A,
-                  //                 barHeight: 2,
-                  //                 thumbRadius: 0,
-                  //                 onSeek: playerProvider.isLoaded
-                  //                     ? (duration) async {
-                  //                         await playerProvider
-                  //                             .audioPlayer
-                  //                             .seek(duration);
-                  //                       }
-                  //                     : null,
-                  //               );
-                  //             });
-                  //       }),
-                  // ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        left: MyConst.CONTAINER_PADDING,
-                        right: MyConst.CONTAINER_PADDING,
-                        top: 0.0,
-                        bottom: 0.0,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  currentVideo.title ?? "Unknown",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: COLOR_A,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(
-                                  height: 4,
-                                ),
-                                Text(
-                                  currentVideo.author ?? "Unknown",
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 24,
-                          ),
-                          Row(
+                  Transform.translate(
+                    offset: const Offset(0, 0),
+                    child: StreamBuilder(
+                        stream: playerProvider.audioPlayer.positionStream,
+                        builder: (context, snapshot1) {
+                          final Duration duration =
+                              playerProvider.isLoaded && snapshot1.hasData
+                                  ? snapshot1.data as Duration
+                                  : const Duration(seconds: 0);
+                          return StreamBuilder(
+                              stream: playerProvider
+                                  .audioPlayer.bufferedPositionStream,
+                              builder: (context, snapshot2) {
+                                final Duration bufferedDuration =
+                                    playerProvider.isLoaded && snapshot2.hasData
+                                        ? snapshot2.data as Duration
+                                        : const Duration(seconds: 0);
+                                return ProgressBar(
+                                  progress: duration,
+                                  total: playerProvider.audioPlayer.duration ??
+                                      const Duration(seconds: 0),
+                                  buffered: bufferedDuration,
+                                  timeLabelLocation: TimeLabelLocation.none,
+                                  progressBarColor: COLOR_B,
+                                  baseBarColor: Colors.grey[900],
+                                  bufferedBarColor: COLOR_C,
+                                  thumbColor: COLOR_A,
+                                  barHeight: 2,
+                                  thumbRadius: 0,
+                                  onSeek: playerProvider.isLoaded
+                                      ? (duration) async {
+                                          await playerProvider.audioPlayer
+                                              .seek(duration);
+                                        }
+                                      : null,
+                                );
+                              });
+                        }),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.only(
+                      left: MyConst.CONTAINER_PADDING,
+                      right: MyConst.CONTAINER_PADDING,
+                      top: 12,
+                      bottom: 0,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              // renderMediaButton(
-                              //   Icons.skip_previous,
-                              //   () {},
-                              // ),
-                              // const SizedBox(
-                              //   width: 4.0,
-                              // ),
-                              renderMediaButton(
-                                playerProvider.isPlaying
-                                    ? Icons.pause
-                                    : Icons.play_arrow,
-                                () {
-                                  playerProvider.isPlaying
-                                      ? playerProvider.onPause()
-                                      : playerProvider.onPlay();
-                                },
+                              Text(
+                                currentVideo.title ?? "Unknown",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: COLOR_A,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              // const SizedBox(
-                              //   width: 4.0,
-                              // ),
-                              // renderMediaButton(
-                              //   Icons.skip_next,
-                              //   () {},
-                              // ),
+                              const SizedBox(
+                                height: 4,
+                              ),
+                              Text(
+                                currentVideo.author ?? "Unknown",
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
                             ],
-                          )
-                        ],
-                      ),
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 24,
+                        ),
+                        Row(
+                          children: [
+                            // renderMediaButton(
+                            //   Icons.skip_previous,
+                            //   () {},
+                            // ),
+                            // const SizedBox(
+                            //   width: 4.0,
+                            // ),
+                            renderMediaButton(
+                              playerProvider.isPlaying
+                                  ? Icons.pause
+                                  : Icons.play_arrow,
+                              () {
+                                playerProvider.isPlaying
+                                    ? playerProvider.onPause()
+                                    : playerProvider.onPlay();
+                              },
+                            ),
+                            // const SizedBox(
+                            //   width: 4.0,
+                            // ),
+                            // renderMediaButton(
+                            //   Icons.skip_next,
+                            //   () {},
+                            // ),
+                          ],
+                        )
+                      ],
                     ),
                   ),
                 ],
               ),
-            ),
-          ),
-        ],
+            )
+          : null,
+      body: Home(
+        onLoadMore: onLoadMore,
       ),
     );
   }
@@ -269,23 +264,9 @@ class Search extends SearchDelegate {
   }
 
   @override
-Widget buildResults(BuildContext context) {
-  return FutureBuilder(
-    future: News.fetchArticle,
-    builder: (context, AsyncSnapshot<List<Article>> snapshot) {
-      if(snapshot != null)
-        return Text("No articles found!");
-      else {
-        return ListView.builder(
-          itemCount: snapshot.data.length,
-          builder: (context, pos) {
-            ....
-          }
-        );
-      }
-    }
-  );
-}
+  Widget buildResults(BuildContext context) {
+    return Container();
+  }
 
   final List<String> listExample;
   Search(this.listExample);

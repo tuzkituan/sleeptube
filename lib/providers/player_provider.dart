@@ -31,7 +31,8 @@ class PlayerProvider with ChangeNotifier {
         "author": video.author.toString(),
         "channelId": video.channelId.toString(),
         "uploadDate": video.uploadDate.toString(),
-        "description": video.description.toString()
+        "description": video.description.toString(),
+        "thumbnail": video.thumbnails.mediumResUrl.toString()
       });
       notifyListeners();
     }

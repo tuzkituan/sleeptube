@@ -13,8 +13,8 @@ class Tag extends StatelessWidget {
         vertical: 4,
       ),
       decoration: BoxDecoration(
-        color: Colors.black26,
-        borderRadius: BorderRadius.circular(27),
+        color: Colors.white10,
+        borderRadius: BorderRadius.circular(8),
       ),
       alignment: Alignment.center,
       child: Text(

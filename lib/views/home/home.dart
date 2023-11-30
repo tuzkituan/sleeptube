@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sleeptube/components/big_thumbnail_item/big_thumbnail_item.dart';
 import 'package:sleeptube/components/logo/logo.dart';
-import 'package:sleeptube/components/search_input/search_input.dart';
 import 'package:sleeptube/components/tag/tag.dart';
 import 'package:sleeptube/components/video_item/video_item.dart';
 import 'package:sleeptube/models/PlayingVideoModel.dart';
 import 'package:sleeptube/models/PopularVideosResponse.dart';
-import 'package:sleeptube/models/SearchResponse.dart';
 import 'package:sleeptube/providers/player_provider.dart';
 import 'package:sleeptube/providers/youtube_provider.dart';
 import 'package:sleeptube/utils/color.dart';
@@ -138,6 +137,22 @@ class _HomeState extends State<Home> {
   //   );
   // }
 
+  Widget createTitle({String title = ""}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: MyConst.CONTAINER_PADDING,
+      ),
+      child: Text(
+        title,
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w700,
+          fontSize: 24,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     PopularVideosResponse? popularVideosResponse =
@@ -157,12 +172,8 @@ class _HomeState extends State<Home> {
       "Popular",
       "Latest",
       "Trending",
-      "Popular",
-      "Latest",
-      "Trending",
-      "Popular",
-      "Latest",
-      "Trending"
+      "Relax",
+      "Meditation",
     ];
 
     return Container(
@@ -178,10 +189,11 @@ class _HomeState extends State<Home> {
         ),
       ),
       width: MediaQuery.of(context).size.width,
-      child: ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        controller: _scrollController,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          // LOGO
           Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: MyConst.CONTAINER_PADDING,
@@ -192,28 +204,40 @@ class _HomeState extends State<Home> {
               children: [
                 const Logo(),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     IconButton(
                       onPressed: () {},
                       icon: const Icon(
                         Icons.search,
                       ),
+                    ),
+                    const SizedBox(
+                      width: 8,
+                    ),
+                    CircleAvatar(
+                      radius: 15,
+                      backgroundColor: COLOR_B,
                     )
                   ],
                 ),
               ],
             ),
           ),
+
+          // TAGS
+          const SizedBox(
+            height: MyConst.CONTAINER_PADDING,
+          ),
           Container(
             height: 32,
             width: MediaQuery.of(context).size.width,
-            margin: const EdgeInsets.symmetric(
-              vertical: MyConst.CONTAINER_PADDING / 2,
-              horizontal: MyConst.CONTAINER_PADDING,
-            ),
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: tags.length,
+              padding: const EdgeInsets.symmetric(
+                horizontal: MyConst.CONTAINER_PADDING,
+              ),
               itemBuilder: (context, index) {
                 return Tag(
                   onTap: () {},
@@ -228,24 +252,43 @@ class _HomeState extends State<Home> {
             ),
           ),
 
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(
-          //     horizontal: MyConst.CONTAINER_PADDING,
-          //     vertical: MyConst.CONTAINER_PADDING,
-          //   ),
-          //   child: Text(
-          //     "Popular Videos".toUpperCase(),
-          //     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-          //           color: Colors.white,
-          //           fontWeight: FontWeight.bold,
-          //         ),
-          //   ),
-          // ),
-          Expanded(
-            child: (items != null)
-                ? renderPopularList(items, playingId, isLoading)
-                : Container(),
+          const SizedBox(
+            height: MyConst.CONTAINER_PADDING * 2,
           ),
+          // POPULAR LIST
+          createTitle(title: "Popular now"),
+          if (items != null)
+            SizedBox(
+              height: 440,
+              child: GridView.count(
+                physics: const ClampingScrollPhysics(),
+                shrinkWrap: true,
+                crossAxisCount: 2,
+                padding: const EdgeInsets.symmetric(
+                  vertical: MyConst.CONTAINER_PADDING,
+                  horizontal: MyConst.CONTAINER_PADDING,
+                ),
+                // physics: const ClampingScrollPhysics(),
+                scrollDirection: Axis.horizontal,
+                crossAxisSpacing: MyConst.CONTAINER_PADDING * 3 / 4,
+                mainAxisSpacing: MyConst.CONTAINER_PADDING * 1.5,
+                childAspectRatio: 6 / 3.5,
+                children: [
+                  for (int i = 0; i < items.length; i++)
+                    BigThumbnailItem(
+                      onTap: onSelectVideo,
+                      isPlaying: playingId != null && playingId == items[i].id!,
+                      id: items[i].id!,
+                      author: items[i].snippet!.channelTitle,
+                      thumbnailUrl:
+                          items[i].snippet!.thumbnails!.medium!.url ?? "",
+                      title: items[i].snippet!.title,
+                    ),
+                ],
+              ),
+            ),
+
+          createTitle(title: "Listen again"),
         ],
       ),
     );

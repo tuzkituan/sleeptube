@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sleeptube/models/PlayingVideoModel.dart';
@@ -53,7 +52,7 @@ class _LayoutState extends State<Layout> {
       child: Container(
         padding: const EdgeInsets.all(6.0),
         decoration: BoxDecoration(
-          color: COLOR_C,
+          color: COLOR_D,
           borderRadius: const BorderRadius.all(Radius.circular(30)),
         ),
         child: Icon(icon),
@@ -77,79 +76,112 @@ class _LayoutState extends State<Layout> {
       //   toolbarHeight: 0,
       // ),
       extendBodyBehindAppBar: false,
-      bottomNavigationBar: playerProvider.isLoaded
-          ? Container(
-              height: 70,
-              decoration: BoxDecoration(
-                color: COLOR_E,
+      bottomNavigationBar: Container(
+        height: 70,
+        decoration: BoxDecoration(
+          color: COLOR_D,
+        ),
+        margin: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+        padding: EdgeInsets.zero,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.only(
+                left: MyConst.CONTAINER_PADDING,
+                right: MyConst.CONTAINER_PADDING,
+                top: 0,
+                bottom: 0,
               ),
-              padding: EdgeInsets.zero,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.only(
-                      left: MyConst.CONTAINER_PADDING,
-                      right: MyConst.CONTAINER_PADDING,
-                      top: 0,
-                      bottom: 0,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                currentVideo.title ?? "Unknown",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: COLOR_A,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(
-                                height: 4,
-                              ),
-                              Text(
-                                currentVideo.author ?? "Unknown",
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
+                  if (currentVideo.thumbnail != null) ...[
+                    SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(4.0),
+                        child: AspectRatio(
+                          aspectRatio: 1 / 1,
+                          child: Image.network(
+                            currentVideo.thumbnail!,
+                            fit: BoxFit.cover,
                           ),
                         ),
-                        const SizedBox(
-                          width: 24,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 12,
+                    ),
+                  ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          currentVideo.title ?? "Unknown",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: COLOR_A,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        Row(
-                          children: [
-                            renderMediaButton(
-                              playerProvider.isPlaying
-                                  ? Icons.pause
-                                  : Icons.play_arrow,
-                              () {
-                                playerProvider.isPlaying
-                                    ? playerProvider.onPause()
-                                    : playerProvider.onPlay();
-                              },
-                            ),
-                          ],
-                        )
+                        const SizedBox(
+                          height: 4,
+                        ),
+                        Text(
+                          currentVideo.author ?? "Unknown",
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
                       ],
                     ),
                   ),
+                  const SizedBox(
+                    width: 24,
+                  ),
+                  Row(
+                    children: [
+                      renderMediaButton(
+                        Icons.skip_previous,
+                        () {},
+                      ),
+                      const SizedBox(
+                        width: 4.0,
+                      ),
+                      renderMediaButton(
+                        playerProvider.isPlaying
+                            ? Icons.pause
+                            : Icons.play_arrow,
+                        () {
+                          playerProvider.isPlaying
+                              ? playerProvider.onPause()
+                              : playerProvider.onPlay();
+                        },
+                      ),
+                      const SizedBox(
+                        width: 4.0,
+                      ),
+                      renderMediaButton(
+                        Icons.skip_next,
+                        () {},
+                      ),
+                    ],
+                  )
                 ],
               ),
-            )
-          : null,
+            ),
+          ],
+        ),
+      ),
+
       body: Home(
         onLoadMore: onLoadMore,
       ),

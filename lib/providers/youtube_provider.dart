@@ -19,13 +19,13 @@ class YoutubeProvider with ChangeNotifier {
 
     try {
       notifyListeners();
-      Map<String, dynamic> finalParams = isLoadMore && nextPageToken.isNotEmpty
+      dynamic finalParams = isLoadMore && nextPageToken.isNotEmpty
           ? {"pageToken": nextPageToken, ...params}
           : params;
 
       dynamic response = await _youtubeService.getPopularVideo(finalParams);
       notifyListeners();
-      if (response != null) {
+      if (response != null && response != false) {
         PopularVideosResponse temp = PopularVideosResponse.fromJson(response);
         print("nextPageToken: ${temp.nextPageToken}");
         if (!isLoadMore) {
@@ -36,13 +36,13 @@ class YoutubeProvider with ChangeNotifier {
         nextPageToken = temp.nextPageToken ?? "";
         searchVideos = null;
         isSearching = false;
-        notifyListeners();
       }
+      popularVideoLoading = false;
+      notifyListeners();
     } catch (e) {
       print("error: $e");
       rethrow;
     }
-    popularVideoLoading = false;
   }
 
   Future<void> searchVideo(params) async {

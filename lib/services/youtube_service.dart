@@ -11,9 +11,8 @@ class YoutubeService {
       dynamic response = await HttpService.getAPI(api, params);
       return json.decode(response);
     } on SocketException {
-      // apiResponse.ApiError = ApiError(error: "Server error. Please retry");
-    } /*  */
-    return false;
+      throw Exception("Server error occurred");
+    }
   }
 
   Future<dynamic> searchVideos(dynamic params) async {
